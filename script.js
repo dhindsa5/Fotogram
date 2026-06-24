@@ -69,25 +69,26 @@ function getLikeIconSvg(liked) {
 function createGalleryItem(image, index) {
   const liked = isLiked(index);
   return `
-    <div class="gallery-card" data-index="${index}" role="button" tabindex="0" aria-label="View image: ${image.title}">
-      <img
-        class="gallery-card__image"
-        src="${image.src}"
-        alt="${image.title}"
-        width="150"
-        height="150"
-        loading="lazy"
-        decoding="async"
-      >
+    <li class="gallery-card" data-index="${index}">
+      <button class="gallery-card__open-button" type="button" aria-label="View image: ${image.title}">
+        <img
+          class="gallery-card__image"
+          src="${image.src}"
+          alt="${image.title}"
+          width="150"
+          height="150"
+          loading="lazy"
+          decoding="async"
+        >
+      </button>
       <button
         class="like-button ${liked ? "is-liked" : ""}"
         type="button"
         aria-label="${liked ? "Unlike photo" : "Like photo"}"
-        data-index="${index}"
       >
         ${getLikeIconSvg(liked)}
       </button>
-    </div>
+    </li>
   `;
 }
 
@@ -98,29 +99,22 @@ function renderGallery() {
 
 function setupGalleryListeners() {
   gallery.querySelectorAll(".gallery-card").forEach((card) => {
-    card.addEventListener("click", (event) => handleCardClick(event, card));
-    card.addEventListener("keydown", (event) => handleCardKey(event, card));
+    card.addEventListener("click", (event) => {
+      const index = Number(card.dataset.index);
+      const openBtn = event.target.closest(".gallery-card__open-button");
+      const likeBtn = event.target.closest(".like-button");
+
+      if (likeBtn) {
+        handleLikeToggle(index, likeBtn);
+        return;
+      }
+
+      if (openBtn) {
+        openLightbox(index);
+        return;
+      }
+    });
   });
-}
-
-function handleCardClick(event, card) {
-  const index = Number(card.dataset.index);
-  const likeBtn = event.target.closest(".like-button");
-
-  if (likeBtn) {
-    event.stopPropagation();
-    handleLikeToggle(index, likeBtn);
-    return;
-  }
-
-  openLightbox(index);
-}
-
-function handleCardKey(event, card) {
-  if (event.key === "Enter" || event.key === " ") {
-    event.preventDefault();
-    openLightbox(Number(card.dataset.index));
-  }
 }
 
 function handleLikeToggle(index, triggerButton = null) {
@@ -131,7 +125,7 @@ function handleLikeToggle(index, triggerButton = null) {
     updateButtonState(triggerButton, liked);
   }
 
-  const galleryLikeButton = gallery.querySelector(`.like-button[data-index="${index}"]`);
+  const galleryLikeButton = gallery.querySelector(`.gallery-card[data-index="${index}"] .like-button`);
   if (galleryLikeButton && galleryLikeButton !== triggerButton) {
     updateButtonState(galleryLikeButton, liked);
   }

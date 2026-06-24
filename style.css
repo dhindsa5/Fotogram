@@ -149,6 +149,7 @@ select {
 }
 
 .gallery-grid {
+  list-style: none;
   width: 100%;
   display: flex;
   flex-wrap: wrap;
@@ -156,25 +157,31 @@ select {
   align-items: center;
   align-content: center;
   gap: 48px 16px;
+  padding: 0;
+  margin: 0;
 }
 
 .gallery-card {
   position: relative;
   width: 150px;
   height: 150px;
-  padding: 0;
-  border: 0;
-  background: transparent;
-  cursor: pointer;
   transition: transform var(--transition);
   border-radius: var(--radius-card);
 }
 
-.gallery-card:hover {
+.gallery-card__open-button {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  border-radius: var(--radius-card);
+}
+
+.gallery-card:hover, .gallery-card:has(:focus-visible) {
   transform: translateY(-4px);
 }
 
-.gallery-card:focus-visible {
+.gallery-card__open-button:focus-visible {
   outline: 3px solid var(--color-focus);
   outline-offset: 5px;
 }
@@ -189,7 +196,7 @@ select {
 }
 
 .gallery-card:hover .gallery-card__image,
-.gallery-card:focus-visible .gallery-card__image {
+.gallery-card__open-button:focus-visible ~ .gallery-card__image {
   border-color: var(--color-focus);
 }
 
@@ -384,7 +391,7 @@ select {
 }
 
 .gallery-card:hover .like-button,
-.gallery-card:focus-within .like-button,
+.gallery-card:has(:focus-visible) .like-button,
 .gallery-card .like-button.is-liked {
   opacity: 1;
   transform: scale(1);
